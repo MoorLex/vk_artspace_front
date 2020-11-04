@@ -1,0 +1,26 @@
+{
+  "name": "vk_artspace",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "vk-deploy": "vk-miniapps-deploy",
+    "deploy": "npm run build && npm run vk-deploy"
+  },
+  "dependencies": {
+    "@tailwindcss/ui": "^0.7.2",
+    "@vkontakte/vk-bridge": "^2.3.0",
+    "axios": "^0.21.0",
+    "cropperjs": "^1.5.9",
+    "moment": "^2.29.1",
+    "swiper": "^6.3.5",
+    "tailwindcss": "^1.9.6",
+    "vue": "^3.0.2",
+    "vue-router": "^4.0.0-rc.1"
+  },
+  "devDependencies": {
+    "@vkontakte/vk-miniapps-deploy": "0.0.22",
+    "@vue/compiler-sfc": "^3.0.2",
+    "vite": "^1.0.0-rc.9"
+  }
+}
