@@ -1,5 +1,6 @@
 <template>
-  <Panel>
+  <Panel refresh
+         @refresh="refresh">
     <div v-ptr="getData">
       <Link v-for="(item, idx) in complaints.hits"
             :key="idx"
@@ -61,6 +62,10 @@ export default {
   methods: {
     async getData() {
       return await this.complaints.getData(true)
+    },
+    async refresh() {
+      this.complaints.reset()
+      return await this.getData()
     }
   }
 }

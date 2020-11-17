@@ -26,6 +26,10 @@ export default class Shot {
     return this.raw.author.avatar
   }
 
+  get authorDonut() {
+    return this.raw.author.donut
+  }
+
   get isLiked() {
     return this.raw.is_liked
   }
@@ -99,6 +103,16 @@ export default class Shot {
 
   async update(params) {
     const { data } = await Api.updateShot(this.id, params)
+    this.raw = data
+  }
+
+  async makePrivate() {
+    const { data } = await Api.makeShotPrivate(this.id)
+    this.raw = data
+  }
+
+  async makePublic() {
+    const { data } = await Api.makeShotPublic(this.id)
     this.raw = data
   }
 

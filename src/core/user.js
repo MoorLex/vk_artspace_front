@@ -29,7 +29,7 @@ export default class User {
   }
 
   get banner() {
-    return this.raw.banner || { lg: '/banner.png' }
+    return this.raw.banner || { lg: 'https://sun9-69.userapi.com/-d_8C5kE-85-EXqQ_-N1q8iw0ciOhryVJqpAHw/j1qf9J8r8-s.jpg' }
   }
 
   get following() {
@@ -45,7 +45,7 @@ export default class User {
   }
 
   get status() {
-    return this.isDonut ? this.raw.status : {
+    return this.isDonut && this.raw.status || {
       id: 0,
       name: 'Пользователь'
     }

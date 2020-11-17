@@ -87,8 +87,8 @@
         </Link>
       </div>
 
-      <Button color="primary w-full mt-3"
-              class="justify-center"
+      <Button color="primary"
+              class="justify-center w-full mb-3"
               @click="submit">
         Закрыть
       </Button>

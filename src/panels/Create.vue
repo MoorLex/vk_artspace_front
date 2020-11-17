@@ -1,24 +1,23 @@
 <template>
   <Panel>
-    <Banner title="Все публикации проходят модерацию."
-            class="mx-3 mt-3 rounded-lg">
-      <p class="text-sm leading-4 text-secondary">
-        В случае несоответствия контента
-        <a href="https://vk.com/dev/uterms"
-           target="_blank"
-           class="text-link inline-block">
-          правилам ВКонтакте,
-        </a>
-        а так же
-        <Link route="rules"
-              class="text-link inline-block">
-          сервиса,
-        </Link>
-        ваша публикация может быть отклонена.
-      </p>
-    </Banner>
-
-    <div class="p-3">
+    <div class="grid gap-4 px-3 py-4">
+      <Banner title="Все публикации проходят модерацию."
+              class="rounded-lg">
+        <p class="text-sm leading-4 text-secondary">
+          В случае несоответствия контента
+          <a href="https://vk.com/dev/uterms"
+             target="_blank"
+             class="text-link inline-block">
+            правилам ВКонтакте,
+          </a>
+          а так же
+          <Link route="rules"
+                class="text-link inline-block">
+            сервиса,
+          </Link>
+          ваша публикация может быть отклонена.
+        </p>
+      </Banner>
 
       <Ratio :ratio="3/4"
              class="bg-button-secondary rounded-lg overflow-hidden border">
@@ -57,19 +56,19 @@
         </div>
       </Ratio>
 
-      <div class="grid grid-cols-3 gap-3 mt-3">
+      <div class="grid grid-cols-3 gap-3">
         <Ratio v-for="(file, idx) in form.files"
                :key="idx"
                :ratio="3/4"
                :src="file.preview"
-               class="bg-button-secondary rounded-lg overflow-hidden border">
+               class="bg-button-secondary cursor-pointer rounded-lg overflow-hidden border">
           <div class="absolute inset-0"
                @click="onPreviewClick(idx)"/>
 
           <div class="top-0 right-0 p-1 absolute">
             <IconButton color="secondary"
                         size="6"
-                        circle
+                        rounded="full"
                         @click="removePreview(idx)">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </IconButton>
@@ -78,7 +77,7 @@
         <Ratio v-for="idx in 3 - form.files.length"
                :key="idx"
                :ratio="3/4"
-               class="bg-button-secondary rounded-lg overflow-hidden border">
+               class="bg-button-secondary cursor-pointer rounded-lg overflow-hidden border">
           <div class="absolute inset-0 flex justify-center items-center"
                @click="onPreviewClick(3)">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
@@ -86,40 +85,37 @@
         </Ratio>
       </div>
 
-      <div class="mt-5">
-        <Input label="Имя (200 символов)"
-               placeholder="Назовите своё творение"
+      <Input label="Имя (200 символов)"
+             placeholder="Назовите своё творение"
+             aria-label=""
+             v-model="form.title"
+             :valid="form.title.length < 200" />
+      <TextArea label="Информация (500 символов)"
+                placeholder="Расскажите о своем творении"
+                aria-label=""
+                v-model="form.description"
+                :valid="form.description.length < 500" />
+      <div class="cursor-pointer"
+           @click="$refs.tags.open()">
+        <Input label="Теги"
+               placeholder="Максимум 5 тегов"
                aria-label=""
-               v-model="form.title"
-               :valid="form.title.length < 200"
-               class="mb-4" />
-        <TextArea label="Информация (500 символов)"
-                  placeholder="Расскажите о своем творении"
-                  aria-label=""
-                  v-model="form.description"
-                  :valid="form.description.length < 500"
-                  class="mb-4" />
-        <div @click="$refs.tags.open()">
-          <Input label="Теги"
-                 placeholder="Максимум 5 тегов"
-                 aria-label=""
-                 tabindex="-1"
-                 :value="form.tags.map(({ name }) => name).join(', ')"
-                 class="pointer-events-none" />
-        </div>
-        <div v-if="profile.isDonut"
-             class="mt-4"
-             @click="$refs.options.open()">
-          <Input label="Видимость"
-                 aria-label=""
-                 tabindex="-1"
-                 :value="form.private ? 'Только по сслке' : 'Видно всем'"
-                 class="pointer-events-none" />
-        </div>
+               tabindex="-1"
+               :value="form.tags.map(({ name }) => name).join(', ')"
+               class="pointer-events-none" />
+      </div>
+      <div v-if="profile.isDonut"
+           class="cursor-pointer"
+           @click="$refs.options.open()">
+        <Input label="Видимость"
+               aria-label=""
+               tabindex="-1"
+               :value="form.private ? 'Только по ссылке' : 'Видно всем'"
+               class="pointer-events-none" />
       </div>
 
       <Button color="primary"
-              class="w-full mt-4 justify-center"
+              class="w-full justify-center"
               :loading="submitting"
               @click="onSubmit">
         Загрузить
@@ -128,6 +124,7 @@
 
     <ModalTags ref="tags" />
     <ModalDonut ref="donut" />
+    <ModalToken ref="token" />
 
     <Alert ref="errorAlert"
            title="Ошибка"
@@ -135,7 +132,7 @@
            cancel-text="Хорошо" />
     <Alert ref="requiredAlert"
            title="Ошибка"
-           text="Вам необходимо загрузить хоть бы одно изображение."
+           text="Вам необходимо загрузить хотя бы одно изображение."
            cancel-text="Хорошо" />
     <Alert ref="linkAlert"
            title="Ошибка"
@@ -143,7 +140,11 @@
            cancel-text="Хорошо" />
     <Alert ref="maxLengthAlert"
            title="Ошибка"
-           text="Мы не можем опубликовать пост содержащий большое количество букв в названии или описании."
+           text="Мы не можем опубликовать пост, содержащий большое количество букв в названии или описании."
+           cancel-text="Хорошо" />
+    <Alert ref="maxSizeAlert"
+           title="Ошибка"
+           text="Ого, какое большое творение. Попробуйте загрузить поменьше."
            cancel-text="Хорошо" />
 
     <ActionSheet ref="options"
@@ -152,8 +153,8 @@
 </template>
 
 <script>
-import form from '../store/shot'
 import Api from '../api'
+import form from '../store/shot'
 import profile from '../store/profile'
 import asyncMap from '../utils/asyncMap'
 import Cropper from '../utils/cropper'
@@ -172,6 +173,7 @@ import Alert from '../components/Alert.vue'
 import Link from '../components/Link.vue'
 import ModalTags from '../modals/ModalTags.vue'
 import ModalDonut from '../modals/ModalDonut.vue'
+import ModalToken from '../modals/ModalToken.vue'
 
 function readFile(file) {
   return new Promise(resolve => {
@@ -213,6 +215,7 @@ export default {
     TextArea,
     ModalTags,
     ModalDonut,
+    ModalToken,
     IconButton,
     ActionSheet,
     Panel,
@@ -238,7 +241,7 @@ export default {
           click: () => this.form.private = false
         },
         {
-          label: 'Только по сслке',
+          label: 'Только по ссылке',
           click: () => this.form.private = true
         }
       ]
@@ -264,7 +267,7 @@ export default {
       const cropper = this.$refs[`cropper_${this.selected}`]
 
       this.form.files[this.selected].detail = event.detail
-      this.form.files[this.selected].preview = cropper.getCroppedCanvas({ maxHeight: 400, maxWidth: 400 }).toDataURL()
+      this.form.files[this.selected].preview = cropper.getCroppedCanvas({ maxHeight: 600, maxWidth: 600 }).toDataURL()
     }, 400),
     onPreviewClick(select) {
       if (this.form.files[select]) {
@@ -289,8 +292,6 @@ export default {
     },
     async onFileChange (e) {
       if (e.target.files && e.target.files.length > 0) {
-        this.loading = true
-
         const file = e.target.files[0]
         const image = {
           id: str(5),
@@ -298,6 +299,13 @@ export default {
           detail: {},
           preview: undefined
         }
+
+        if (file.size > 2810000) {
+          this.$refs.maxSizeAlert.open()
+          return
+        }
+
+        this.loading = true
 
         if (this.type === 'change') {
           this.form.files[this.selected] = image
@@ -317,6 +325,13 @@ export default {
       this.input.value = ''
     },
     async onSubmit() {
+      await profile.getToken()
+
+      if (!profile.token) {
+        this.$refs.token.open()
+        return
+      }
+
       if (!checkUrlsInText(this.form.description)) {
         this.$refs.linkAlert.open()
         return
@@ -342,14 +357,18 @@ export default {
       this.submitting = true
 
       try {
+        await profile.getAlbum()
+        const { upload_url } = await profile.getUploadServer()
+
         const tags = this.form.tags.map(({ id }) => id)
         const images = await asyncMap(this.form.files, async (v, idx) => {
           const cropper = this.$refs[`cropper_${idx}`]
-          return await getCanvasBlob(cropper.getCroppedCanvas({ maxHeight: 1600, maxWidth: 1600 }))
+          return await getCanvasBlob(cropper.getCroppedCanvas())
         })
 
-        const files = await Api.uploadMedia(images)
-        const { data } = await Api.createShot({ ...this.form, files: undefined, tags }, files)
+        const options = await Api.uploadMedia(upload_url, images)
+        const files = await profile.saveUploadedImages(options)
+        const { data } = await Api.createShot({ ...this.form, tags }, files)
 
         profile.shots.push(data)
 

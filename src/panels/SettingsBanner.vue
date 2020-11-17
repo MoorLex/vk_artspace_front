@@ -36,10 +36,16 @@
       </Button>
     </div>
 
+    <ModalToken ref="token" />
+
     <Alert ref="alert"
            title="Ошибка"
            text="Что-то пошло не так, попробуйте загрузить обложку чуть позже..."
            cancel-text="Обидно" />
+    <Alert ref="maxSizeAlert"
+           title="Ошибка"
+           text="Ого, какое большое творение. Попробуйте загрузить поменьше."
+           cancel-text="Хорошо" />
   </Panel>
 </template>
 
@@ -50,6 +56,8 @@ import Ratio from '../components/Ratio.vue'
 import Button from '../components/Button.vue'
 import Alert from '../components/Alert.vue'
 import IconButton from '../components/IconButton.vue'
+import ModalToken from '../modals/ModalToken.vue'
+import Api from "../api";
 
 function readFile(file) {
   return new Promise(resolve => {
@@ -67,6 +75,7 @@ export default {
     Button,
     Alert,
     IconButton,
+    ModalToken,
   },
   data() {
     return {
@@ -102,15 +111,34 @@ export default {
     async onFileChange (e) {
       if (e.target.files && e.target.files.length > 0) {
         const file = e.target.files[0]
+
+
+        if (file.size > 2810000) {
+          this.$refs.maxSizeAlert.open()
+          return
+        }
+
         await this.submit(file)
       }
       this.input.value = ''
     },
     async submit(file) {
+      await profile.getToken()
+
+      if (!profile.token) {
+        this.$refs.token.open()
+        return
+      }
+
       this.submitting = true
 
       try {
-        const { data } = await profile.updateBanner(file)
+        await profile.getAlbum()
+        const { upload_url } = await profile.getUploadServer()
+        const options = await Api.uploadMedia(upload_url, [file])
+        const files = await profile.saveUploadedImages(options)
+        const { data } = await Api.saveProfileMedia(files)
+
         const image = new Image()
         image.src = data.banner.lg
         image.onload = () => {
@@ -120,6 +148,7 @@ export default {
           }, 100)
         }
       } catch (e) {
+        console.log(e)
         this.$refs.alert.open()
         this.submitting = false
       }

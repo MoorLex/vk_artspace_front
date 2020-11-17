@@ -1,17 +1,18 @@
 <template>
-  <div class="border-t border-b p-3">
+  <div class="border-t border-b p-3 relative">
     <div class="flex justify-between items-center">
       <span class="text-sm text-secondary">
         Реклама {{ data.ageRestrictions }}
       </span>
       <IconButton color="secondary"
                   size="6"
-                  circle
+                  rounded="full"
                   @click="$emit('close')">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </IconButton>
     </div>
     <a :href="data.trackingLink"
+       @click="currentPixel = statsPixels.click || ''"
        target="_blank"
        class="block">
       <div class="mt-3 flex items-center">
@@ -35,6 +36,10 @@
         </div>
       </div>
     </a>
+    <img v-if="currentPixel"
+         :src="currentPixel"
+         class="absolute opacity-0 pointer-events-none top-0 left-0"
+         alt="">
   </div>
 </template>
 
@@ -59,6 +64,23 @@ export default {
     Ratio,
     Button,
     IconButton
+  },
+  data() {
+    return {
+      currentPixel: undefined
+    }
+  },
+  created() {
+    if (this.statsPixels.playbackStarted) {
+      this.currentPixel = this.statsPixels.playbackStarted
+    }
+  },
+  computed: {
+    statsPixels() {
+      return this.data.statistics
+        ? this.data.statistics.reduce((acc, item) => ({ ...acc, [item.type]: item.url }), {})
+        : {}
+    }
   },
 }
 </script>

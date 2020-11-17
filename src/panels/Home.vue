@@ -75,7 +75,7 @@
       </svg>
 
       <h3 class="text-lg font-medium mb-1">
-        Творений не нейдено
+        Творений не найдено
       </h3>
 
       <p class="mb-3 text-secondary">

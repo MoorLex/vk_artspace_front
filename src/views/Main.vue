@@ -10,7 +10,7 @@
       :leave-to-class="`transform ${transition.leave.split('|')[1]}`"
     >
       <component :is="Component"
-                 class="min-h-screen"
+                 class="min-h-screen flex flex-col"
                  style="padding-bottom: calc(var(--tabbar_height) + var(--safe-area-inset-bottom))" />
     </transition>
   </router-view>

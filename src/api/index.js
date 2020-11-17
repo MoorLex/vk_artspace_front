@@ -52,6 +52,7 @@ export class Api {
   async getUsers (page, filters) {
     const params = {
       page: page || 1,
+      per_page: 50,
       ...filters
     }
     const { data } = await this.request(HttpMethodsEnum.GET, '/users', params)
@@ -166,8 +167,8 @@ export class Api {
     return data
   }
 
-  async updateProfile (id, params) {
-    const { data } = await this.request(HttpMethodsEnum.PUT, `/users/${id}`, params)
+  async updateProfile (params) {
+    const { data } = await this.request(HttpMethodsEnum.PUT, '/users/me', params)
     return data
   }
 
@@ -230,21 +231,24 @@ export class Api {
     return data
   }
 
-  async updateShot (id, params) {
-    const { data } = await this.request(HttpMethodsEnum.PUT, `/shots/${id}`, params)
+  async makeShotPrivate (id) {
+    const { data } = await this.request(HttpMethodsEnum.POST, `/shots/${id}/private`)
     return data
   }
 
-  async uploadMedia (images, category) {
+  async makeShotPublic (id) {
+    const { data } = await this.request(HttpMethodsEnum.POST, `/shots/${id}/public`)
+    return data
+  }
+
+  async uploadMedia (upload_url, images) {
     const formData = new FormData()
 
     images.forEach((img) => {
       formData.append(`media[]`, img)
     })
 
-    if (category) {
-      formData.append(`category`, category)
-    }
+    formData.append(`upload_url`, upload_url)
 
     const { data } = await this.request(HttpMethodsEnum.POST, '/media/upload', formData)
     return data

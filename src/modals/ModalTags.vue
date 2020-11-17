@@ -4,7 +4,7 @@
     <div v-for="(tag, idx) in tags.hits"
          :key="idx"
          @click="toggleTag(tag)"
-         class="flex items-center px-4 py-4 sm:px-6">
+         class="flex items-center px-4 py-4 sm:px-6 cursor-pointer">
       <div class="mr-4">
         <div class="h-5 w-5 rounded border flex items-center justify-center text-white"
              :class="[
@@ -19,6 +19,7 @@
         {{ tag.name }}
       </div>
     </div>
+
     <template #footer>
       <div class="sticky bottom-0 bg-content border-t"
            style="padding-bottom: var(--safe-area-inset-bottom)">
