@@ -12,7 +12,7 @@
                class="pointer-events-none" />
       </div>
 
-      <TextArea label="Коментарий"
+      <TextArea label="Комментарий"
                 placeholder="Опишите проблему подробнее, если это необходимо."
                 aria-label=""
                 v-model="form.message"

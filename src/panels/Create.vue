@@ -10,12 +10,12 @@
              class="text-link inline-block">
             правилам ВКонтакте,
           </a>
-          а так же
+          а также
           <Link route="rules"
                 class="text-link inline-block">
             сервиса,
           </Link>
-          ваша публикация может быть отклонена.
+          Ваша публикация может быть отклонена.
         </p>
       </Banner>
 
