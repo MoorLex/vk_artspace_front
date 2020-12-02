@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { disableScroll, enableScroll } from '../utils/scroll'
 import TopBar from '../components/TopBar.vue'
 
 export default {
@@ -48,13 +49,16 @@ export default {
       show: false
     }
   },
+  beforeUnmount() {
+    enableScroll()
+  },
   methods: {
     open() {
-      document.body.classList.add('overflow-hidden')
+      disableScroll()
       this.show = true
     },
     close() {
-      document.body.classList.remove('overflow-hidden')
+      enableScroll()
       this.show = false
     }
   }

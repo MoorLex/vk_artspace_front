@@ -7,6 +7,7 @@ import Api from '../api'
 export const state = reactive({
   feed: {
     main: new ShotsProcessor({
+      withPromo: true,
       fetch: (page, params) => Api.getShots(page, params)
     }),
     popular: new ShotsProcessor({
@@ -19,6 +20,9 @@ export const state = reactive({
       fetch: (page, params) => Api.getShots(page, { ...params, check: true })
     })
   },
+  search: new ShotsProcessor({
+    fetch: (page, params) => Api.getShots(page, params)
+  }),
   favorites: new ShotsProcessor({
     fetch: (page, params) => Api.getFavorites(page, params)
   }),

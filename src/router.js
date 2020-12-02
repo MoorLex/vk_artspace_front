@@ -222,9 +222,21 @@ const router = createRouter({
         ...stack('user')
       ]
     },
+    {
+      path: '/:catchAll(.*)',
+      name: 'NotFound',
+      component: () => import('./panels/NotFound.vue'),
+      meta: {
+        title: 'Не найдено',
+      },
+    }
   ],
   scrollBehavior: (to, from, savedPosition) => {
     let position
+
+    if (from.hash === '#action' || from.hash === '#alert' || from.hash === '#modal') {
+      return
+    }
 
     if (savedPosition) {
       position = savedPosition

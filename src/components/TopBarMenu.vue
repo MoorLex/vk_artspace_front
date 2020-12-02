@@ -34,9 +34,12 @@
 </template>
 
 <script>
+import { disableScroll, enableScroll } from '../utils/scroll'
+
 export default {
   name: 'TopBarMenu',
   props: {
+    modelValue: Boolean,
     speed: {
       type: [String, Number],
       default: 300
@@ -52,6 +55,9 @@ export default {
       show: false
     }
   },
+  beforeUnmount() {
+    enableScroll()
+  },
   methods: {
     toggle() {
       if (this.show) {
@@ -61,13 +67,15 @@ export default {
       }
     },
     open() {
-      document.body.classList.add('overflow-hidden')
+      disableScroll()
       this.show = true
+      this.$emit('update:modelValue', this.show)
     },
     close(disable) {
-      document.body.classList.remove('overflow-hidden')
       if (!disable) {
+        enableScroll()
         this.show = false
+        this.$emit('update:modelValue', this.show)
       }
     },
     onClick(item) {

@@ -4,10 +4,22 @@ import Bridge from '@vkontakte/vk-bridge'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { setApiHandleError } from './api'
 import profile from './store/profile'
 import config from './store/config'
+import errors from './store/errors'
 import './utils/localeMoment'
 import './index.css'
+
+setApiHandleError((err) => {
+  if (err.message === 'Network Error') {
+    errors.networkError = true
+  }
+
+  if (err.response?.status === 429) {
+    errors.networkFlood = true
+  }
+})
 
 const schemeAttribute = document.createAttribute('scheme')
 document.body.attributes.setNamedItem(schemeAttribute)

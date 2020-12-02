@@ -6,7 +6,13 @@ export default class ShotsProcessor extends Processor {
     super({
       ...params,
       fetch: params.fetch,
-      mapping: (item) => new Shot(item)
+      mapping: (item) => {
+        if (item.type === 'promo') {
+          return item
+        }
+
+        return new Shot(item)
+      }
     })
   }
 }

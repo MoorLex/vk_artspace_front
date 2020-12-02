@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import { disableScroll, enableScroll } from '../utils/scroll'
 import TopBar from '../components/TopBar.vue'
 
 export default {
@@ -55,19 +56,40 @@ export default {
   components: {
     TopBar
   },
+  watch: {
+    $route(route, from) {
+      if (route.hash === '#alert' || route.hash === '#action') {
+        return
+      }
+
+      if (this.show && (from.hash === '#modal' && route.hash !== '#modal')) {
+        this.show = false
+        enableScroll()
+      }
+    }
+  },
   data() {
     return {
       show: false
     }
   },
+  beforeUnmount() {
+    enableScroll()
+  },
   methods: {
     open() {
-      document.body.classList.add('overflow-hidden')
-      this.show = true
+      if (!this.show) {
+        disableScroll()
+        this.show = true
+        this.$router.push({ hash: '#modal' })
+      }
     },
     close() {
-      document.body.classList.remove('overflow-hidden')
-      this.show = false
+      if (this.show) {
+        enableScroll()
+        this.show = false
+        this.$router.back()
+      }
     }
   }
 }

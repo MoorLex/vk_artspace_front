@@ -51,11 +51,16 @@
       </svg>
 
       <h3 class="text-lg font-medium mb-1">
-        Подписок нет
+        Подписчиков нет
       </h3>
 
-      <p class="mb-3 text-secondary">
-        Но Вы не переживайте, публикуйте интересные рисунки и кто-то обязательно подпишется на Вас.
+      <p v-if="isMe"
+         class="mb-3 text-secondary">
+        Но Вы не переживайте, публикуйте интересные рисунки, и кто-то обязательно подпишется на Вас.
+      </p>
+      <p v-else
+         class="mb-3 text-secondary">
+        Но Вы можете станьте первым!
       </p>
     </div>
 
@@ -65,6 +70,7 @@
 
 <script>
 import Api from '../api'
+import profile from '../store/profile'
 import lists from '../store/lists'
 import UsersProcessor from '../core/users-processor'
 import Panel from '../components/Panel.vue'
@@ -89,9 +95,13 @@ export default {
       users: lists.followers[this.id]
     }
   },
+  computed: {
+    isMe() {
+      return this.id === 'me' || profile.id === this.id
+    }
+  },
   created() {
     if (!this.users) {
-
       this.users = new UsersProcessor({
         id: this.id,
         fetch: (page, params) => Api.getFollowers(params.id, page, params)

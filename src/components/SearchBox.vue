@@ -7,7 +7,9 @@
     <input aria-label=""
            :value="modelValue || value"
            ref="input"
+           :maxlength="maxLength"
            @input="$emit('update:modelValue', $event.target.value)"
+           @keyup="onKeyUp"
            class="flex-1 bg-input h-12 px-0 border-none focus:outline-none appearance-none focus:shadow-none placeholder-muted block w-full sm:text-sm sm:leading-5"
            :placeholder="placeholder">
     <button v-if="modelValue || value"
@@ -26,9 +28,20 @@ export default {
       type: String,
       default: 'Поиск...'
     },
+    maxLength: {
+      type: Number,
+      default: 50
+    },
     modelValue: String,
     value: String
   },
+  methods: {
+    onKeyUp(event) {
+      if (event.keyCode === 13) {
+        this.$refs.input.blur()
+      }
+    }
+  }
 }
 </script>
 

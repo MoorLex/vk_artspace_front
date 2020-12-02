@@ -13,7 +13,16 @@
           <span class="flex items-center cursor-pointer"
                 @click="$refs.menu.toggle()">
             <span>{{ tab.label }}</span>
-            <svg class="w-4 h-4 ml-2 mt-1 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <svg class="w-4 h-4 ml-2 mt-1 text-accent"
+                 :class="[
+                   menuIsOpen && 'transform rotate-180'
+                 ]"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
           </span>
         </template>
       </TopBar>
@@ -21,6 +30,7 @@
     </template>
 
     <TopBarMenu ref="menu"
+                v-model="menuIsOpen"
                 :items="items"/>
 
     <div class="px-3 mt-5 mb-3 flex">
@@ -33,6 +43,7 @@
         </Button>
       </Link>
       <Link route="search"
+            :params="{ clear: true }"
             class="ml-3"
             deep>
         <IconButton color="secondary">
@@ -92,13 +103,14 @@ import platform from '../utils/platform'
 import lists from '../store/lists'
 import profile from '../store/profile'
 import config from '../store/config'
-import TopBar from '../components/TopBar.vue'
-import TopBarMenu from '../components/TopBarMenu.vue'
-import Panel from '../components/Panel.vue'
 import Shot from '../components/Shot.vue'
 import Link from '../components/Link.vue'
-import IconButton from '../components/IconButton.vue'
+import Panel from '../components/Panel.vue'
+import TopBar from '../components/TopBar.vue'
 import Button from '../components/Button.vue'
+import PromoShot from '../components/PromoShot.vue'
+import TopBarMenu from '../components/TopBarMenu.vue'
+import IconButton from '../components/IconButton.vue'
 import ProcessorObserve from '../components/ProcessorObserve.vue'
 
 export default {
@@ -109,6 +121,7 @@ export default {
     TopBar,
     Panel,
     Button,
+    PromoShot,
     TopBarMenu,
     IconButton,
     ProcessorObserve
@@ -117,7 +130,8 @@ export default {
     return {
       config,
       platform,
-      feeds: lists.feed
+      feeds: lists.feed,
+      menuIsOpen: false
     }
   },
   computed: {

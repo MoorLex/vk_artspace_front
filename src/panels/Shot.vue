@@ -81,7 +81,7 @@
         </div>
       </div>
 
-      <div v-if="shot.media.length > 1"
+      <div v-if="shot.media.length > 1 && !shot.deleted"
            class="mt-4 px-3">
         <div class="grid grid-cols-3 gap-3">
           <Ratio v-for="(image, idx) in shot.media"
@@ -101,7 +101,8 @@
           <svg class="w-4 h-4 mr-2" :class="shot.isLiked && 'text-like'" :fill="shot.isLiked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
           <span>{{ shot.likes }}</span>
         </button>
-        <button type="button"
+        <button v-if="shot.published"
+                type="button"
                 class="inline-flex mr-auto items-center font-bold px-2 py-2 text-sm leading-5 font-medium rounded-lg focus:outline-none"
                 @click="share">
           <svg class="w-4 h-6 transform scale-x-mirror" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
@@ -184,7 +185,7 @@
           </div>
         </div>
 
-        <div v-if="latest.length > 0">
+        <div v-if="latest.length > 4">
           <h3 class="leading-5 text-secondary font-medium mb-3">
             Больше от автора
           </h3>
@@ -208,7 +209,7 @@
                    :items="blockItems"/>
 
       <Alert ref="alert"
-             title="Вы уверены что хотите удалить творение?"
+             title="Вы уверены, что хотите удалить творение?"
              text="После удаления вернуть творение будет очень трудно, подумайте дважды!"
              :items="[{ label: 'Удалить', click: () => this.remove() }]"/>
 
@@ -277,7 +278,7 @@ export default {
   },
   watch: {
     $route(route) {
-      if (route.name.split('/').includes('shot')) {
+      if (route.name.split('/').includes('shot') && parseInt(route.params.id) !== this.shot.id) {
         this.shot = undefined
         this.$nextTick(() => {
           this.getPromo()
@@ -306,8 +307,12 @@ export default {
       return [
         {
           label: 'Удалить',
-          hide: !this.shot.isMeAuthor,
-          click: () => this.$refs.alert.open()
+          hide: !this.shot.isMeAuthor || this.shot.deleted,
+          click: () => {
+            setTimeout(() => {
+              this.$refs.alert.open()
+            }, 200)
+          }
         },
         {
           label: 'Скрыть',
@@ -320,12 +325,22 @@ export default {
           click: () => this.shot.makePublic()
         },
         {
+          label: 'Заблокировать',
+          hide: !this.canModerate || this.shot.blocked || !this.shot.published,
+          click: () => this.block()
+        },
+        {
           label: 'Поделиться',
+          hide: !this.shot.published,
           click: () => this.share()
         },
         {
           label: 'Пожаловаться',
-          click: () => this.$refs.complaint.open()
+          click: () => {
+            setTimeout(() => {
+              this.$refs.complaint.open()
+            }, 200)
+          }
         }
       ]
     },
@@ -346,7 +361,11 @@ export default {
       this.swiper = swiper;
     },
     share() {
-      const link = 'https://vk.com/app7588282' + this.$route.href
+      const url = this.$route.href.replace('#modal', '')
+        .replace('#alert', '')
+        .replace('#action', '')
+
+      const link = 'https://vk.com/app7588282' + url
 
       Bridge.send("VKWebAppShare", { link });
     },
@@ -390,12 +409,16 @@ export default {
           label: item.name,
           click: () => {
             this.blockId = item.id
-            this.$refs.blockAlert.open()
+            setTimeout(() => {
+              this.$refs.blockAlert.open()
+            }, 200)
           }
         }))
       }
 
-      this.$refs.blockOptions.open()
+      setTimeout(() => {
+        this.$refs.blockOptions.open()
+      }, 200)
     },
     async load() {
       try {
@@ -408,8 +431,8 @@ export default {
         await this.$nextTick(() => {
           this.ready = true
         })
-      } catch (e) {
-        this.error = e.response.status
+      } catch (err) {
+        this.error = err.response.status
       }
     },
     async remove() {
@@ -433,9 +456,14 @@ export default {
       }
     },
     updateShot() {
-      Object.keys(lists.feed).map((key) => {
+      Object.keys(lists.feed).forEach((key) => {
         lists.feed[key].update(this.shot.raw)
       })
+
+      lists.tag.forEach((item) => {
+        item.update(this.shot.raw)
+      })
+
       lists.favorites.update(this.shot.raw)
     }
   }

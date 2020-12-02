@@ -27,14 +27,14 @@
             <div v-for="(item, idx) in items.filter(({ hide }) => !hide)"
                  :key="idx"
                  @click="onClick(item)"
-                 class="flex items-center border-t justify-center px-3 py-2 leading-10 text-gray-900 focus:outline-none">
+                 class="flex cursor-pointer items-center border-t justify-center px-3 py-2 leading-10 text-gray-900 focus:outline-none">
               <span class="truncate">
                 {{ item.label }}
               </span>
             </div>
             <div v-if="!required"
                  @click="cancel"
-                 class="flex items-center border-t justify-center px-3 py-2 font-medium leading-10 text-gray-900 focus:outline-none">
+                 class="flex cursor-pointer items-center border-t justify-center px-3 py-2 font-medium leading-10 text-gray-900 focus:outline-none">
               <span class="truncate">
                 {{ cancelText }}
               </span>
@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import { disableScroll, enableScroll } from '../utils/scroll'
+
 export default {
   name: 'Alert',
   props: {
@@ -66,22 +68,39 @@ export default {
       default: 'Отмена'
     }
   },
+  watch: {
+    $route(route) {
+      if (this.show && route.hash !== '#alert') {
+        this.show = false
+        enableScroll()
+      }
+    }
+  },
   data() {
     return {
       show: false
     }
   },
+  beforeUnmount() {
+    enableScroll()
+  },
   methods: {
     open() {
-      this.show = true
+      if (!this.show) {
+        disableScroll()
+        this.show = true
+        this.$router.push({ hash: '#alert' })
+      }
     },
     cancel() {
       this.$emit('cancel')
       this.close()
     },
     close(disable) {
-      if (!disable) {
+      if (!disable && this.show) {
+        enableScroll()
         this.show = false
+        this.$router.back()
       }
     },
     onClick(item) {

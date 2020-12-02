@@ -2,7 +2,7 @@
   <ModalPage ref="modal"
              title="Жалоба">
     <div class="p-3">
-      <div class="mb-4"
+      <div class="mb-4 cursor-pointer"
            @click="select">
         <Input label="Тема"
                placeholder="Причина жалобы"
@@ -15,6 +15,7 @@
       <TextArea label="Комментарий"
                 placeholder="Опишите проблему подробнее, если это необходимо."
                 aria-label=""
+                :max-length="500"
                 v-model="form.message"
                 class="mb-4" />
 

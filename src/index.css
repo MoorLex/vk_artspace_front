@@ -454,6 +454,7 @@ body[platform=android] {
 }
 
 body{
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   background: var(--background_content);
   color: var(--text_primary);
   overflow-x: hidden;

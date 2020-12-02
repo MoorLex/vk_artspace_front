@@ -22,7 +22,7 @@
 
     <div v-if="!error"
          class="grid gap-4 mb-4"
-         v-ptr="getData">
+         v-ptr="refresh">
       <div class="">
         <Ratio :ratio="9/22"
                :src="profile.banner && profile.banner.lg"
@@ -144,12 +144,6 @@
       </div>
 
       <ProcessorObserve :processor="profile.shots" />
-
-      <ActionSheet ref="options"
-                   :items="items"/>
-
-      <ModalComplaint ref="complaint"
-                      :model="{ type: 'user', id }"/>
     </div>
     <div v-else-if="error"
          class="flex flex-col items-center text-center px-3 max-w-sm mx-auto leading-5 my-10">
@@ -162,6 +156,13 @@
         Такого творца нет.
       </p>
     </div>
+
+    <ActionSheet v-if="!error"
+                 ref="options"
+                 :items="items"/>
+
+    <ModalComplaint ref="complaint"
+                    :model="{ type: 'user', id }"/>
   </Panel>
 </template>
 
@@ -217,12 +218,16 @@ export default {
     }
   },
   watch: {
-    $route() {
-      this.profile = undefined
-      this.$nextTick(() => {
-        this.profile = this.id === 'me' ? profile : lists.user[this.id]
-        this.load()
-      })
+    $route(route) {
+      const id = parseInt(route.params.id) || profile.id
+
+      if (id !== this.profile.id) {
+        this.profile = undefined
+        this.$nextTick(() => {
+          this.profile = this.id === 'me' ? profile : lists.user[this.id]
+          this.load()
+        })
+      }
     }
   },
   computed: {
@@ -251,13 +256,17 @@ export default {
         },
         {
           label: 'Заблокировать',
-          hide: profile.isMe || !profile.isAdmin || this.profile.isBanned,
+          hide: this.profile.isMe || !profile.isAdmin || this.profile.isBanned,
           click: () => this.profile.ban()
         },
         {
           label: 'Пожаловаться',
           hide: this.profile.isMe,
-          click: () => this.$refs.complaint.open()
+          click: () => {
+            setTimeout(() => {
+              this.$refs.complaint.open()
+            }, 200)
+          }
         }
       ]
     }
@@ -269,7 +278,7 @@ export default {
     pronunciation,
     number,
     share() {
-      const link = 'https://vk.com/app7588282' + this.$route.href
+      const link = `https://vk.com/app7588282#/user/profile/${this.profile.id}`
 
       Bridge.send("VKWebAppShare", { link });
     },

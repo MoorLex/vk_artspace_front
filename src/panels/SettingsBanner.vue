@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div class="flex mb-5 px-3">
+    <div class="flex px-3">
       <Button color="primary"
               class="w-full justify-center"
               :loading="submitting"
@@ -45,6 +45,10 @@
     <Alert ref="maxSizeAlert"
            title="Ошибка"
            text="Ого, какое большое творение. Попробуйте загрузить поменьше."
+           cancel-text="Хорошо" />
+    <Alert ref="formatAlert"
+           title="Ошибка"
+           text="Сервис принимает изображения только в формате JPG, JPEG и PNG."
            cancel-text="Хорошо" />
   </Panel>
 </template>
@@ -105,6 +109,7 @@ export default {
   },
   created() {
     this.input.type = 'file'
+    this.input.accept = 'image/jpeg,image/png'
     this.input.onchange = (e) => this.onFileChange(e)
   },
   methods: {
@@ -112,6 +117,10 @@ export default {
       if (e.target.files && e.target.files.length > 0) {
         const file = e.target.files[0]
 
+        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+          this.$refs.formatAlert.open()
+          return
+        }
 
         if (file.size > 2810000) {
           this.$refs.maxSizeAlert.open()
@@ -148,7 +157,6 @@ export default {
           }, 100)
         }
       } catch (e) {
-        console.log(e)
         this.$refs.alert.open()
         this.submitting = false
       }

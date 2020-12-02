@@ -19,42 +19,48 @@
         </p>
       </Banner>
 
-      <Ratio :ratio="3/4"
-             class="bg-button-secondary rounded-lg overflow-hidden border">
-        <div v-if="loading"
-             class="bg-button-secondary z-50 absolute inset-0 flex items-center justify-center">
-          <Spinner size="10"/>
+      <div class="">
+        <div class="block mb-1 text-sm font-medium leading-5 text-secondary">
+          Изображения не больше 3mb
         </div>
-        <div v-if="ready"
-             class="absolute inset-0">
-          <div v-for="(file, idx) in form.files"
-               :key="file.src"
-               class="absolute inset-0"
-               :class="idx !== selected && 'opacity-0 invisible'">
-            <Cropper :src="file.src"
-                     :ref="`cropper_${idx}`"
-                     @crop="onCrop"
-                     :viewMode="3"
-                     :data="file.details"
-                     :autoCropArea="1"
-                     dragMode="move"
-                     :preview="this.$refs[`preview_${idx}`]"
-                     :restore="false"
-                     :modal="false"
-                     :guides="false"
-                     :center="false"
-                     :highlight="false"
-                     :cropBoxMovable="false"
-                     :cropBoxResizable="false"
-                     :toggleDragModeOnDblclick="false"/>
+        <Ratio :ratio="3/4"
+               class="bg-button-secondary rounded-lg overflow-hidden border">
+          <div v-if="loading"
+               class="bg-button-secondary z-50 absolute inset-0 flex items-center justify-center">
+            <Spinner size="10"/>
           </div>
-        </div>
-        <div v-if="form.files.length === 0"
-             class="absolute inset-0 flex items-center justify-center"
-             @click="input.click()">
-          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-        </div>
-      </Ratio>
+          <div v-if="ready"
+               class="absolute inset-0">
+            <div v-for="(file, idx) in form.files"
+                 :key="file.id"
+                 class="absolute inset-0"
+                 :class="idx !== selected && 'opacity-0 invisible'">
+              <Cropper :src="file.src"
+                       :ref="`cropper_${idx}`"
+                       @crop="onCrop"
+                       @zoom="onZoom"
+                       :viewMode="3"
+                       :data="file.details"
+                       :autoCropArea="1"
+                       dragMode="move"
+                       :preview="this.$refs[`preview_${idx}`]"
+                       :restore="false"
+                       :modal="false"
+                       :guides="false"
+                       :center="false"
+                       :highlight="false"
+                       :cropBoxMovable="false"
+                       :cropBoxResizable="false"
+                       :toggleDragModeOnDblclick="false"/>
+            </div>
+          </div>
+          <div v-if="form.files.length === 0"
+               class="absolute inset-0 flex items-center justify-center"
+               @click="inputTrigger">
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </div>
+        </Ratio>
+      </div>
 
       <div class="grid grid-cols-3 gap-3">
         <Ratio v-for="(file, idx) in form.files"
@@ -91,18 +97,24 @@
              v-model="form.title"
              :valid="form.title.length < 200" />
       <TextArea label="Информация (500 символов)"
-                placeholder="Расскажите о своем творении"
+                placeholder="Расскажите о своём творении"
                 aria-label=""
                 v-model="form.description"
                 :valid="form.description.length < 500" />
       <div class="cursor-pointer"
            @click="$refs.tags.open()">
-        <Input label="Теги"
-               placeholder="Максимум 5 тегов"
-               aria-label=""
-               tabindex="-1"
-               :value="form.tags.map(({ name }) => name).join(', ')"
-               class="pointer-events-none" />
+        <TextArea label="Теги"
+                  placeholder="Максимум 5 тегов"
+                  aria-label=""
+                  tabindex="-1"
+                  :rows="1"
+                  inputClass="pr-12"
+                  :value="form.tags.map(({ name }) => name).join(', ')"
+                  class="pointer-events-none">
+          <div class="absolute top-0 right-0 h-12 w-12 flex justify-center items-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+        </TextArea>
       </div>
       <div v-if="profile.isDonut"
            class="cursor-pointer"
@@ -145,6 +157,10 @@
     <Alert ref="maxSizeAlert"
            title="Ошибка"
            text="Ого, какое большое творение. Попробуйте загрузить поменьше."
+           cancel-text="Хорошо" />
+    <Alert ref="formatAlert"
+           title="Ошибка"
+           text="Мы уверены, что Вы хотели загрузить что-то чудесное, но сервис принимает изображения только в формате JPG, JPEG и PNG."
            cancel-text="Хорошо" />
 
     <ActionSheet ref="options"
@@ -230,6 +246,7 @@ export default {
       loading: false,
       type: undefined,
       submitting: false,
+      inputToggled: false,
       input: document.createElement('input')
     }
   },
@@ -249,13 +266,17 @@ export default {
   },
   created() {
     this.input.type = 'file'
+    this.input.accept = 'image/jpeg,image/png'
     this.input.onchange = (e) => this.onFileChange(e)
-
-    this.form.title = ''
-    this.form.description = ''
-    this.form.private = false
-    this.form.tags = []
-    this.form.files = []
+  },
+  beforeRouteEnter(to, from) {
+    if (from.name !== 'create/rules') {
+      form.title = ''
+      form.description = ''
+      form.private = false
+      form.tags = []
+      form.files = []
+    }
   },
   mounted() {
     this.$nextTick(() => {
@@ -269,18 +290,28 @@ export default {
       this.form.files[this.selected].detail = event.detail
       this.form.files[this.selected].preview = cropper.getCroppedCanvas({ maxHeight: 600, maxWidth: 600 }).toDataURL()
     }, 400),
+    inputTrigger: debounce(function(event) {
+      this.input.click()
+    }, 100),
+    onZoom(e) {
+      const cropper = this.$refs[`cropper_${this.selected}`]
+
+      if (cropper.getData().width < 500 && e.detail.originalEvent.deltaY < 0) {
+        e.preventDefault();
+      }
+    },
     onPreviewClick(select) {
       if (this.form.files[select]) {
 
         if (select === this.selected) {
           this.type = 'change'
-          this.input.click()
+          this.inputTrigger()
         }
 
         this.selected = select
       } else {
         this.type = 'upload'
-        this.input.click()
+        this.inputTrigger()
       }
     },
     removePreview(select) {
@@ -298,6 +329,11 @@ export default {
           src: await readFile(file),
           detail: {},
           preview: undefined
+        }
+
+        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+          this.$refs.formatAlert.open()
+          return
         }
 
         if (file.size > 2810000) {

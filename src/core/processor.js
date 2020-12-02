@@ -75,6 +75,7 @@ export default class Processor {
 
     if (item >= 0) {
       this.hits.splice(item, 1)
+      this.pagination.total -= 1
     }
 
     return item >= 0

@@ -1,5 +1,8 @@
 import axios from 'axios'
 import HttpMethodsEnum from './httpMethodsEnum'
+import errors from '../store/errors'
+
+let handleError
 
 export class Api {
   constructor () {
@@ -19,29 +22,44 @@ export class Api {
       //   method: response.config.method,
       //   time: response.config.requestTime + ' ms'
       // })
+
+      if (handleError instanceof Function) {
+        handleError(response)
+      }
+
       return response
     })
   }
 
   async request (method, url, params, headers = {}) {
-    const config = {
-      method: (method === HttpMethodsEnum.PUT) ? HttpMethodsEnum.POST : method,
-      headers: headers,
-      url: url
-    }
-
-    if (method === HttpMethodsEnum.GET) {
-      config.params = params
-    } else if (method === HttpMethodsEnum.POST) {
-      if (params instanceof FormData) {
-        headers['Content-Type'] = 'multipart/form-data'
+    try {
+      const config = {
+        method: (method === HttpMethodsEnum.PUT) ? HttpMethodsEnum.POST : method,
+        headers: headers,
+        url: url
       }
-      config.data = params
-    } else if (method === HttpMethodsEnum.PUT) {
-      config.data = { ...params, _method: 'put' }
-    }
 
-    return await this.axios.request(config)
+      if (method === HttpMethodsEnum.GET) {
+        config.params = params
+      } else if (method === HttpMethodsEnum.POST) {
+        if (params instanceof FormData) {
+          headers['Content-Type'] = 'multipart/form-data'
+        }
+        config.data = params
+      } else if (method === HttpMethodsEnum.PUT) {
+        config.data = { ...params, _method: 'put' }
+      }
+
+      errors.networkFlood = false
+      errors.networkError = false
+      return await this.axios.request(config)
+    } catch (err) {
+      if (handleError instanceof Function) {
+        handleError(err)
+      }
+
+      throw err
+    }
   }
 
   async login () {
@@ -161,6 +179,7 @@ export class Api {
   async getFollowers (id, page, filters) {
     const params = {
       page: page || 1,
+      per_page: 50,
       ...filters
     }
     const { data } = await this.request(HttpMethodsEnum.GET, `/users/${id}/followers`, params)
@@ -304,6 +323,10 @@ export class Api {
     const { data } = await this.request(HttpMethodsEnum.GET, '/statuses', params)
     return data
   }
+}
+
+export function setApiHandleError (method) {
+  handleError = method
 }
 
 export default new Api()

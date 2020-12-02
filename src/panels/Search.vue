@@ -1,8 +1,7 @@
 <template>
   <Panel>
     <div class="p-3">
-      <SearchBox v-model="query"
-                 @input="loading = true" />
+      <SearchBox v-model="query"/>
     </div>
 
     <div class="flex justify-center py-5"
@@ -10,7 +9,7 @@
       <Spinner size="6" />
     </div>
 
-    <div v-else-if="shots.empty"
+    <div v-else-if="shots.empty && query.length > 2"
          class="flex flex-col items-center text-center px-3 max-w-sm mx-auto leading-5 my-10">
       <svg class="w-36 h-36 mb-5 text-placeholder" fill="none" stroke="currentColor" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -48,8 +47,7 @@
 </template>
 
 <script>
-import ShotsProcessor from '../core/shots-processor'
-import Api from '../api'
+import lists from '../store/lists'
 import debounce from '../utils/debounce'
 import Panel from '../components/Panel.vue'
 import SearchBox from '../components/SearchBox.vue'
@@ -68,21 +66,37 @@ export default {
   },
   data() {
     return {
-      query: '',
+      query: lists.search.params.query || '',
       loading: false,
-      shots: new ShotsProcessor({
-        fetch: (page, params) => Api.getShots(page, params)
-      })
+      shots: lists.search
     }
   },
   watch: {
     query(v) {
+      const query = v.replace(/\n{2,}/g, '\n')
+        .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
+        .trim()
+
+      if (query.length > 2) {
+        this.loading = true
+      }
+
       this.onSearch(v)
+    }
+  },
+  created() {
+    if (this.$route.params.clear) {
+      this.query = ''
+      this.shots.reset()
     }
   },
   methods: {
     onSearch: debounce(async function(query) {
-      if (query) {
+      query = query.replace(/\n{2,}/g, '\n')
+        .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '')
+        .trim()
+
+      if (query && query.length > 2) {
         this.shots.params = { query }
         await this.shots.getData(true)
       } else {

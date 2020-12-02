@@ -54,8 +54,13 @@
         Подписок нет
       </h3>
 
-      <p class="mb-3 text-secondary">
+      <p v-if="isMe"
+         class="mb-3 text-secondary">
         Подпишитесь на любимых творцов и следите за их работами.
+      </p>
+      <p v-else
+         class="mb-3 text-secondary">
+        Творец пока не выбрал на кого хотел бы подписаться.
       </p>
     </div>
 
@@ -65,6 +70,7 @@
 
 <script>
 import Api from '../api'
+import profile from '../store/profile'
 import lists from '../store/lists'
 import UsersProcessor from '../core/users-processor'
 import Panel from '../components/Panel.vue'
@@ -87,6 +93,11 @@ export default {
   data() {
     return {
       users: lists.following[this.id]
+    }
+  },
+  computed: {
+    isMe() {
+      return this.id === 'me' || profile.id === this.id
     }
   },
   created() {

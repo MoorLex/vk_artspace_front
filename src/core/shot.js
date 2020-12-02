@@ -14,6 +14,10 @@ export default class Shot {
     return this.raw.id
   }
 
+  get deleted() {
+    return this.raw.deleted
+  }
+
   get authorName() {
     return this.raw.author.name
   }

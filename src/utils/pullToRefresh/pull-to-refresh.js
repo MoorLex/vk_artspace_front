@@ -1,5 +1,17 @@
 let func
 
+function checkParent(parent, child) {
+  let node = child.parentNode;
+
+  while (node != null) {
+    if (node === parent) {
+      return true;
+    }
+    node = node.parentNode;
+  }
+  return false;
+}
+
 export function PullToRefresh (el, callback) {
   const block = document.createElement('div');
   const pStart = { x: 0, y: 0 };
@@ -68,6 +80,7 @@ export function PullToRefresh (el, callback) {
 
   this.swipeEnd = (e) => {
     isOver = false
+
     if (window.scrollY <= 0 && !isLoading) {
       this.reset()
       document.body.classList.remove('overflow-hidden')
@@ -101,7 +114,7 @@ export function PullToRefresh (el, callback) {
     pCurrent.x = pos.x;
     pCurrent.y = pos.y;
 
-    const max = 100;
+    const max = (window.innerHeight / 100) * 40;
     let changeY = pStart.y < pCurrent.y ? Math.abs(pStart.y - pCurrent.y) : 0;
     const percent = changeY < max ? (changeY / max) * 100 : 100;
 
@@ -121,14 +134,14 @@ export function PullToRefresh (el, callback) {
 
   this.destroy = () => {
     block.outerHTML = ''
-    document.removeEventListener("touchstart", this.swipeStart, false);
-    document.removeEventListener("touchmove", this.swipe, false);
-    document.removeEventListener("touchend", this.swipeEnd, false);
+    el.removeEventListener("touchstart", this.swipeStart, false);
+    el.removeEventListener("touchmove", this.swipe, false);
+    el.removeEventListener("touchend", this.swipeEnd, false);
   }
 
-  document.addEventListener("touchstart", this.swipeStart, false);
-  document.addEventListener("touchmove", this.swipe, false);
-  document.addEventListener("touchend", this.swipeEnd, false);
+  el.addEventListener("touchstart", this.swipeStart, false);
+  el.addEventListener("touchmove", this.swipe, false);
+  el.addEventListener("touchend", this.swipeEnd, false);
 }
 
 export default {

@@ -17,7 +17,7 @@
           <div v-for="(item, idx) in items.filter(({ hide }) => !hide)"
                :key="idx"
                @click="onClick(item)"
-               class="flex items-center justify-center px-3 py-2 leading-10 text-gray-900 focus:outline-none"
+               class="cursor-pointer flex items-center justify-center px-3 py-2 leading-10 text-gray-900 focus:outline-none"
                :class="idx > 0 && 'border-t'">
             <span class="truncate">
               {{ item.label }}
@@ -42,6 +42,8 @@
 </template>
 
 <script>
+import { disableScroll, enableScroll } from '../utils/scroll'
+
 export default {
   name: 'ActionSheet',
   props: {
@@ -55,19 +57,34 @@ export default {
     },
     required: Boolean
   },
+  watch: {
+    $route(route) {
+      if (this.show && route.hash !== '#action') {
+        this.show = false
+        enableScroll()
+      }
+    }
+  },
   data() {
     return {
       show: false
     }
   },
+  beforeUnmount() {
+    enableScroll()
+  },
   methods: {
     open() {
-      document.body.classList.add('overflow-hidden')
-      this.show = true
+      if (!this.show) {
+        disableScroll()
+        this.show = true
+        this.$router.push({ hash: '#action' })
+      }
     },
     close(disable) {
-      document.body.classList.remove('overflow-hidden')
-      if (!disable) {
+      if (!disable && this.show) {
+        enableScroll()
+        this.$router.back()
         this.show = false
       }
     },

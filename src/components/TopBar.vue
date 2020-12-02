@@ -30,13 +30,24 @@ export default {
     title: String,
     noBack: Boolean
   },
+  data() {
+    return {
+      clicked: false
+    }
+  },
   methods: {
     goBack() {
+      if (this.clicked) {
+        return
+      }
+
       if (window.history.length > 2) {
         this.$router.back()
       } else if (this.root) {
         this.$router.push({ name: this.root + '/main' })
       }
+
+      this.clicked = true
     }
   },
   computed: {
@@ -46,7 +57,7 @@ export default {
     isRoot() {
       const parent = this.$route.matched[0]
 
-      return parent.path === this.$route.path
+      return parent && `${parent.name}/main` === this.$route.name
     },
     root() {
       const parent = this.$route.matched[0]

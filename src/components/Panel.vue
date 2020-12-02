@@ -2,6 +2,7 @@
   <div class="bg-content">
     <slot name="header">
       <TopBar v-if="header"
+              :no-back="noBack"
               :title="panelTitle">
         <template #left
                   v-if="platform.web && refresh">
@@ -43,6 +44,10 @@ export default {
     divider: {
       type: Boolean,
       default: true
+    },
+    noBack: {
+      type: Boolean,
+      default: false
     },
     loading: Boolean,
     title: String
