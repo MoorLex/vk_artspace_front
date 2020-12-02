@@ -96,6 +96,15 @@ export class Api {
     return data
   }
 
+  async getPrivateShots (page, filters) {
+    const params = {
+      page: page || 1,
+      ...filters
+    }
+    const { data } = await this.request(HttpMethodsEnum.GET, '/shots/me/private', params)
+    return data
+  }
+
   async getComplaints (page, filters) {
     const params = {
       page: page || 1,

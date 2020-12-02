@@ -219,6 +219,14 @@ const router = createRouter({
             title: 'Жалоба',
           },
         },
+        {
+          path: 'settings/private',
+          name: 'user/settings/private',
+          component: () => import('./panels/SettingsPrivate.vue'),
+          meta: {
+            title: 'Скрытые',
+          },
+        },
         ...stack('user')
       ]
     },

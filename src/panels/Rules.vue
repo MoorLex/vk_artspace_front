@@ -24,7 +24,7 @@
       <div class="mb-5">
         <h3 class="font-medium text-lg mb-1 leading-6"># Реклама</h3>
         <ul class="list-decimal pl-8">
-          <li>Реклама любого вида в публикациях запрещена.</li>
+          <li>Реклама третьих лиц или внешних ресурсов в публикациях запрещена.</li>
         </ul>
       </div>
 

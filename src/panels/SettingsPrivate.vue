@@ -47,7 +47,7 @@ import Panel from '../components/Panel.vue'
 import ProcessorObserve from '../components/ProcessorObserve.vue'
 
 export default {
-  name: 'Favorites',
+  name: 'SettingsPrivate',
   components: {
     Shot,
     TopBar,
@@ -62,7 +62,7 @@ export default {
   },
   data() {
     return {
-      list: lists.favorites
+      list: lists.private
     }
   },
   created() {

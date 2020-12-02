@@ -26,6 +26,9 @@ export const state = reactive({
   favorites: new ShotsProcessor({
     fetch: (page, params) => Api.getFavorites(page, params)
   }),
+  private: new ShotsProcessor({
+    fetch: (page, params) => Api.getPrivateShots(page, { ...params })
+  }),
   users: new UsersProcessor({
     fetch: (page, params) => Api.getUsers(page, params)
   }),
